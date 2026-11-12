@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Phantom</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Phantom" />
+  <meta name="theme-color" content="#0F0F0F" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <style>
+    :root {
+      --bg: #0F0F0F;
+      --surface: #1A1A1A;
+      --surface-2: #242424;
+      --purple: #AB9FF2;
+      --purple-dark: #2B2640;
+      --text: #FFFFFF;
+      --text-muted: #8E8E93;
+      --green: #30D158;
+      --red: #FF453A;
+      --border: #262628;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    }
+    html {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg);
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      width: 100%;
+      min-height: 100%;
+      background-color: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      user-select: none;
+      padding-top: 0;
+      padding-bottom: 84px;
+    }
+
+    /* Top Nav Header */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(15, 15, 15, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+    }
+    .avatar-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #FDE68A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: none;
+    }
+    .avatar-character {
+      width: 34px;
+      height: 34px;
+      display: block;
+    }
+    .nav-pills {
+      display: flex;
+      gap: 6px;
+    }
+    .nav-pill {
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .nav-pill.active {
+      background: var(--purple);
+      color: #121212;
+    }
+
+    /* Screens */
+    .screen {
+      display: none;
+      padding: 8px 16px 24px;
+    }
+    .screen.active {
+      display: block;
+    }
+
+    /* Balance Section */
+    .balance-amount {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-top: 6px;
+    }
+    .balance-sub {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .text-green { color: var(--green); }
+    .text-red { color: var(--red); }
+    .text-muted { color: var(--text-muted); }
+
+    /* Quick Actions */
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 20px 0 18px;
+    }
+    .action-card {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 14px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      border: none;
+      color: var(--text);
+    }
+    .action-card svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--purple);
+    }
+    .action-card span {
+      font-size: 12px;
+      font-weight: 500;
+      color: #D1D1D6;
+    }
+
+    /* Token Row */
+    .card-box {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .token-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .token-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .token-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1C1C1E;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .token-badge {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      background: #F59E0B;
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      width: 16px;
+      height: 16px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--bg);
+    }
+    .token-name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .token-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .token-right {
+      text-align: right;
+    }
+
+    /* Section Header */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .filter-pills::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      padding: 6px 14px;
+      border-radius: 18px;
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .filter-pill.active {
+      background: #FFFFFF;
+      color: #000000;
+    }
+
+    .market-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 6px;
+    }
+
+    /* Hot Markets Cards */
+    .hot-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+    .hot-scroll::-webkit-scrollbar { display: none; }
+    .hot-card {
+      min-width: 245px;
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .hot-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .hot-bottom {
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot-green {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+    }
+
+    /* Predict Cards */
+    .predict-card {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .progress-bar {
+      height: 6px;
+      border-radius: 4px;
+      background: #2C2C2E;
+      display: flex;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+    .bar-red { background: #FF453A; width: 32%; }
+    .bar-blue { background: #3B82F6; width: 68%; margin-left: auto; }
+    .odds-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .odds-btn {
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* Bottom Floating Search Bar */
+    .bottom-search-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      z-index: 25;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .search-input-box {
+      flex: 1;
+      height: 46px;
+      background: rgba(34, 34, 36, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 23px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+    .fab-plus {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: var(--purple);
+      color: #121212;
+      border: none;
+      font-size: 24px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Left Side Drawer */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 40;
+      display: none;
+    }
+    .drawer-backdrop.open { display: block; }
+    .side-drawer {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 82%;
+      max-width: 320px;
+      background: #121212;
+      z-index: 50;
+      transform: translateX(-100%);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      padding: 20px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .side-drawer.open { transform: translateX(0); }
+    .drawer-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #FDE68A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .drawer-handle {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 14px;
+      letter-spacing: -0.3px;
+    }
+    .drawer-x-link {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .drawer-menu {
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .drawer-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-align: left;
+    }
+    .drawer-item svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-muted);
+    }
+    .account-badge {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+    }
+
+    /* Full Sub-Views (Perfil, Gestionar perfil, Ajustes) */
+    .sub-modal {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 60;
+      display: none;
+      flex-direction: column;
+      padding-top: 0;
+      overflow-y: auto;
+    }
+    .sub-modal.open { display: flex; }
+    .sub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+    }
+    .icon-circle-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: none;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .manage-pill-btn {
+      background: var(--surface-2);
+      color: var(--text);
+      border: none;
+      border-radius: 18px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .profile-body {
+      padding: 10px 16px 32px;
+    }
+    .profile-stats {
+      display: flex;
+      gap: 14px;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .profile-bio-text {
+      color: #E5E5EA;
+      font-size: 14px;
+      font-weight: 400;
+      margin-top: 10px;
+      line-height: 1.35;
+    }
+    .profile-joined {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+    .pos-tabs {
+      display: flex;
+      gap: 8px;
+      margin: 20px 0 16px;
+    }
+    .pos-tab {
+      padding: 7px 16px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .pos-tab.active {
+      background: #FFFFFF;
+      color: #000000;
+    }
+
+    /* Gestionar Perfil List */
+    .settings-group-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin: 18px 0 8px;
+    }
+    .settings-card {
+      background: var(--surface);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      gap: 12px;
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-val {
+      color: var(--text-muted);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-bar">
+    <button class="avatar-btn" onclick="openDrawer()" aria-label="Abrir perfil">
+      <svg class="avatar-character" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="18" fill="#FDE68A"/>
+        <path d="M10 28 C10 17, 26 17, 26 28 Z" fill="#F97316"/>
+        <rect x="13" y="18" width="5" height="3.5" rx="1" fill="#18181B"/>
+        <rect x="19" y="18" width="5" height="3.5" rx="1" fill="#18181B"/>
+        <line x1="18" y1="19.5" x2="19" y2="19.5" stroke="#18181B" stroke-width="1.2"/>
+      </svg>
+    </button>
+    <div class="nav-pills">
+      <button class="nav-pill active" id="tab-inicio" onclick="switchTab('inicio')">Inicio</button>
+      <button class="nav-pill" id="tab-operar" onclick="switchTab('operar')">Operar</button>
+      <button class="nav-pill" id="tab-predecir" onclick="switchTab('predecir')">Predecir</button>
+    </div>
+  </header>
+
+  <!-- SCREEN 1: INICIO -->
+  <main id="screen-inicio" class="screen active">
+    <div class="balance-amount">$63,978.97</div>
+    <div class="balance-sub">
+      <span class="text-green">+$2,418.50</span>
+      <span class="text-green">+3.93%</span>
+      <span class="text-muted">· 426.53 SOL</span>
+    </div>
+
+    <div class="action-grid">
+      <button class="action-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg>
+        <span>Recibir</span>
+      </button>
+      <button class="action-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span>Enviar</span>
+      </button>
+      <button class="action-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        <span>Canjear</span>
+      </button>
+      <button class="action-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span>Depositar</span>
+      </button>
+    </div>
+
+    <div class="card-box">
+      <div class="token-row">
+        <div class="token-left">
+          <div class="token-icon" style="background:#14181F;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M5 16L8 13H20L17 16H5Z" fill="#14F195"/>
+              <path d="M5 8L8 5H20L17 8H5Z" fill="#9945FF"/>
+              <path d="M19 12L16 9H4L7 12H19Z" fill="#00C2FF"/>
+            </svg>
+          </div>
+          <div>
+            <div class="token-name">Solana</div>
+            <div class="token-sub">426.53 SOL</div>
+          </div>
+        </div>
+        <div class="token-right">
+          <div class="token-name">$63,978.97</div>
+          <div class="token-sub text-green">+$2,418.50</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Explora los mercados <span class="text-muted">›</span></div>
+    <div class="filter-pills">
+      <div class="filter-pill">♥</div>
+      <div class="filter-pill active">Trending</div>
+      <div class="filter-pill">Majors</div>
+      <div class="filter-pill">Perps</div>
+      <div class="filter-pill">Global</div>
+    </div>
+
+    <div class="market-list">
+      <div class="token-row">
+        <div class="token-left">
+          <div class="token-icon" style="background:#3B2F2F; color:#FBBF24;">🐕<span class="token-badge">1</span></div>
+          <div>
+            <div class="token-name">Max</div>
+            <div class="token-sub">Cap. merc. de $4.7M</div>
+          </div>
+        </div>
+        <div class="token-right">
+          <div class="token-name">$0.00466987</div>
+          <div class="token-sub text-green">+94,249%</div>
+        </div>
+      </div>
+
+      <div class="token-row">
+        <div class="token-left">
+          <div class="token-icon" style="background:#1E293B; color:#4ADE80;">NV<span class="token-badge">2</span></div>
+          <div>
+            <div class="token-name">NVDAON</div>
+            <div class="token-sub">Cap. merc. de $14M</div>
+          </div>
+        </div>
+        <div class="token-right">
+          <div class="token-name">$158.27</div>
+          <div class="token-sub text-red">-6.46%</div>
+        </div>
+      </div>
+
+      <div class="token-row">
+        <div class="token-left">
+          <div class="token-icon" style="background:#272038; color:#C084FC;">❖<span class="token-badge">3</span></div>
+          <div>
+            <div class="token-name">CARDS</div>
+            <div class="token-sub">Cap. merc. de $173M</div>
+          </div>
+        </div>
+        <div class="token-right">
+          <div class="token-name">$0.19</div>
+          <div class="token-sub text-red">-13.30%</div>
+        </div>
+      </div>
+
+      <div class="token-row">
+        <div class="token-left">
+          <div class="token-icon" style="background:#1C2B2D; color:#2DD4BF;">CL<span class="token-badge">4</span></div>
+          <div>
+            <div class="token-name">CHILL</div>
+            <div class="token-sub">Cap. merc. de $28.4M</div>
+          </div>
+        </div>
+        <div class="token-right">
+          <div class="token-name">$0.02841</div>
+          <div class="token-sub text-green">+412.80%</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCREEN 2: OPERAR -->
+  <section id="screen-operar" class="screen">
+    <div class="section-title" style="margin-bottom:2px;">Hot Markets</div>
+    <div class="text-muted" style="font-size:13px; margin-bottom:12px;">Basada en la actividad de trader</div>
+
+    <div class="hot-scroll">
+      <div class="hot-card">
+        <div class="hot-top">
+          <div class="token-left">
+            <div class="token-icon" style="background:#2C2C2E;">T2</div>
+            <div>
+              <div class="token-name">TTWO</div>
+              <div class="token-sub">$3.9M MC</div>
+            </div>
+          </div>
+          <span class="text-green" style="font-weight:600; font-size:14px;">+2.83%</span>
+        </div>
+        <div class="hot-bottom"><span class="dot-green"></span> 11 personas viendo esto</div>
+      </div>
+
+      <div class="hot-card">
+        <div class="hot-top">
+          <div class="token-left">
+            <div class="token-icon" style="background:#1E293B; color:#38BDF8;">CL</div>
+            <div>
+              <div class="token-name">CHILL</div>
+              <div class="token-sub">$28.4M MC</div>
+            </div>
+          </div>
+          <span class="text-green" style="font-weight:600; font-size:14px;">+412.8%</span>
+        </div>
+        <div class="hot-bottom"><span class="dot-green"></span> 6,804 traders en 4h</div>
+      </div>
+    </div>
+
+    <div class="section-title">Explora los mercados <span class="text-muted">›</span></div>
+    <div class="filter-pills">
+      <div class="filter-pill">♥</div>
+      <div class="filter-pill active">Trending</div>
+      <div class="filter-pill">Perps</div>
+      <div class="filter-pill">Majors</div>
+      <div class="filter-pill">Meme</div>
+    </div>
+
+    <div class="market-list">
+      <div class="token-row">
+        <div class="token-left">
+          <div class="token-icon">PRL</div>
+          <div>
+            <div class="token-name">PRL</div>
+            <div class="token-sub">Cap. merc. de $3M</div>
+          </div>
+        </div>
+        <div class="token-right">
+          <div class="token-name">$0.0792</div>
+          <div class="token-sub text-green">+11.89%</div>
+        </div>
+      </div>
+
+      <div class="token-row">
+        <div class="token-left">
+          <div class="token-icon" style="background:#14532D; color:#86EFAC;">KG</div>
+          <div>
+            <div class="token-name">KGEN</div>
+            <div class="token-sub">Cap. merc. de $22M</div>
+          </div>
+        </div>
+        <div class="token-right">
+          <div class="token-name">$0.0819</div>
+          <div class="token-sub text-green">+21.93%</div>
+        </div>
+      </div>
+
+      <div class="token-row">
+        <div class="token-left">
+          <div class="token-icon" style="background:#3F2E26;">🐱</div>
+          <div>
+            <div class="token-name">mihao</div>
+            <div class="token-sub">Cap. merc. de $17M</div>
+          </div>
+        </div>
+        <div class="token-right">
+          <div class="token-name">$0.0179</div>
+          <div class="token-sub text-red">-2.31%</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREEN 3: PREDECIR -->
+  <section id="screen-predecir" class="screen">
+    <div class="predict-card">
+      <div class="text-muted" style="font-size:12px; font-weight:600;">UEFA Nations League</div>
+      <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px; font-weight:600; font-size:16px;">
+        <div>🇹🇷 Turkiye</div>
+        <div>🇧🇪 Belgium</div>
+      </div>
+      <div class="text-muted" style="font-size:13px; margin-top:8px;">en 11 h</div>
+      <div class="progress-bar">
+        <div class="bar-red"></div>
+        <div class="bar-blue"></div>
+      </div>
+      <div class="odds-row">
+        <div class="odds-btn">25%</div>
+        <div class="odds-btn">54%</div>
+      </div>
+    </div>
+
+    <div class="section-title">Upcoming <span class="text-muted">›</span></div>
+    <div class="hot-scroll">
+      <div class="hot-card" style="min-width:200px;">
+        <div class="token-name">Czechia vs Spain</div>
+        <div class="token-sub" style="margin-top:6px;">en 14 h</div>
+      </div>
+      <div class="hot-card" style="min-width:200px;">
+        <div class="token-name">Italy vs France</div>
+        <div class="token-sub" style="margin-top:6px;">en 14 h</div>
+      </div>
+    </div>
+
+    <div class="section-title">Up or Down <span class="text-muted">›</span></div>
+    <div class="predict-card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="token-left">
+          <div class="token-icon" style="background:#F7931A; color:#FFF;">₿</div>
+          <div>
+            <div class="token-name">$73,517.02</div>
+            <div class="token-sub">Objetivo $73,512.07</div>
+          </div>
+        </div>
+        <span class="text-muted" style="font-size:13px;">02:45</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom Floating Bar -->
+  <div class="bottom-search-bar">
+    <div class="search-input-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Buscar Phantom</span>
+    </div>
+    <button class="fab-plus">+</button>
+  </div>
+
+  <!-- LEFT SIDE DRAWER -->
+  <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+  <aside class="side-drawer" id="side-drawer">
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="drawer-avatar">
+          <svg width="58" height="58" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="18" fill="#FDE68A"/>
+            <path d="M10 28 C10 17, 26 17, 26 28 Z" fill="#F97316"/>
+            <rect x="13" y="18" width="5" height="3.5" rx="1" fill="#18181B"/>
+            <rect x="19" y="18" width="5" height="3.5" rx="1" fill="#18181B"/>
+            <line x1="18" y1="19.5" x2="19" y2="19.5" stroke="#18181B" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <button class="icon-circle-btn" title="Copiar dirección">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+
+      <div class="drawer-handle">@ONOCHA$$$$...</div>
+      <div class="drawer-x-link">𝕏 Conecte su cuenta de X</div>
+
+      <div class="drawer-menu">
+        <div class="drawer-item">
+          <span class="account-badge">C1</span>
+          <span>Cuenta 1 <span class="text-muted">⌄</span></span>
+        </div>
+        <button class="drawer-item" onclick="openProfile()">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span>Perfil</span>
+        </button>
+        <div class="drawer-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Chats</span>
+        </div>
+        <div class="drawer-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span>Lista de observación</span>
+        </div>
+        <div class="drawer-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Historial</span>
+        </div>
+        <div class="drawer-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/></svg>
+          <span>Recomienda y gana</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:18px; border-top:1px solid var(--border); padding-top:18px;">
+      <button class="drawer-item" onclick="openSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Ajustes</span>
+      </button>
+      <div class="drawer-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>Ayuda y soporte</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MODAL: PERFIL -->
+  <div class="sub-modal" id="modal-profile">
+    <div class="sub-header">
+      <button class="icon-circle-btn" onclick="closeProfile()">✕</button>
+      <div style="display:flex; gap:8px;">
+        <button class="manage-pill-btn" onclick="openManageProfile()">Gestionar</button>
+        <button class="icon-circle-btn">↑</button>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="drawer-avatar" style="width:68px; height:68px;">
+        <svg width="68" height="68" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="18" fill="#FDE68A"/>
+          <path d="M10 28 C10 17, 26 17, 26 28 Z" fill="#F97316"/>
+          <rect x="13" y="18" width="5" height="3.5" rx="1" fill="#18181B"/>
+          <rect x="19" y="18" width="5" height="3.5" rx="1" fill="#18181B"/>
+          <line x1="18" y1="19.5" x2="19" y2="19.5" stroke="#18181B" stroke-width="1.2"/>
+        </svg>
+      </div>
+
+      <div class="drawer-handle" style="font-size:26px;">@ONOCHA$$$$...</div>
+      <div class="profile-stats">
+        <span><strong>0</strong> <span class="text-muted">Seguidores</span></span>
+        <span><strong>$63,978.97</strong> <span class="text-muted">Volumen</span></span>
+      </div>
+      <div class="profile-bio-text" id="profile-bio-display">just a chill guy from Ecuador</div>
+      <div class="profile-joined">📅 Se unió Nov 2026</div>
+
+      <div style="font-size:32px; font-weight:700; margin-top:20px;">$63,978.97</div>
+      <div style="font-size:14px; font-weight:600; margin-top:2px;">
+        <span class="text-green">+$2,418.50</span> <span class="text-muted">24h</span>
+      </div>
+
+      <div class="pos-tabs">
+        <button class="pos-tab active" id="pos-btn-open" onclick="switchPosTab('open')">Abiertas</button>
+        <button class="pos-tab" id="pos-btn-closed" onclick="switchPosTab('closed')">Cerradas</button>
+      </div>
+
+      <!-- Abiertas -->
+      <div id="pos-open" style="text-align:center; padding:44px 0; color:var(--text-muted); font-size:15px; font-weight:500;">
+        No hay posiciones abiertas
+      </div>
+
+      <!-- Cerradas (CHILL memecoin profit) -->
+      <div id="pos-closed" style="display:none;">
+        <div class="card-box">
+          <div class="token-row">
+            <div class="token-left">
+              <div class="token-icon" style="background:#132A2E; color:#2DD4BF; font-size:18px;">😎</div>
+              <div>
+                <div class="token-name">CHILL <span style="font-size:11px; background:#1E3A3A; color:#2DD4BF; padding:2px 6px; border-radius:6px; margin-left:4px;">Memecoin</span></div>
+                <div class="token-sub">Entrada $1,420.00 · Cerrada</div>
+              </div>
+            </div>
+            <div class="token-right">
+              <div class="token-name text-green">+$62,558.97</div>
+              <div class="token-sub text-green">+4,405.56%</div>
+            </div>
+          </div>
+          <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:12px; color:var(--text-muted);">
+            <span>Valor realizado: $63,978.97</span>
+            <span>Red: Solana</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GESTIONAR PERFIL -->
+  <div class="sub-modal" id="modal-manage">
+    <div class="sub-header">
+      <button class="icon-circle-btn" onclick="closeManageProfile()">‹</button>
+      <div style="font-size:17px; font-weight:700;">Gestionar perfil</div>
+      <div style="width:34px;"></div>
+    </div>
+
+    <div class="profile-body">
+      <div style="display:flex; justify-content:center; margin:12px 0 20px;">
+        <div class="drawer-avatar" style="width:82px; height:82px; position:relative; overflow:visible;">
+          <svg width="82" height="82" viewBox="0 0 36 36" style="border-radius:50%;">
+            <circle cx="18" cy="18" r="18" fill="#FDE68A"/>
+            <path d="M10 28 C10 17, 26 17, 26 28 Z" fill="#F97316"/>
+            <rect x="13" y="18" width="5" height="3.5" rx="1" fill="#18181B"/>
+            <rect x="19" y="18" width="5" height="3.5" rx="1" fill="#18181B"/>
+            <line x1="18" y1="19.5" x2="19" y2="19.5" stroke="#18181B" stroke-width="1.2"/>
+          </svg>
+          <div style="position:absolute; bottom:0; right:0; width:26px; height:26px; border-radius:50%; background:#2C2C2E; border:2px solid var(--bg); display:flex; align-items:center; justify-content:center; font-size:12px;">✎</div>
+        </div>
+      </div>
+
+      <div class="settings-group-label">Acerca de</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <span>Nombre de usuario</span>
+          <span class="settings-val">@ONOCHA$$$$... ›</span>
+        </div>
+        <div class="settings-row">
+          <span>Biografía</span>
+          <span class="settings-val">just a chill guy from Ecuador ›</span>
+        </div>
+        <div class="settings-row">
+          <span>Conecte su cuenta de X</span>
+          <span class="settings-val">›</span>
+        </div>
+        <div class="settings-row">
+          <span>Conecta tu cuenta de TikTok</span>
+          <span class="settings-val">›</span>
+        </div>
+      </div>
+
+      <div class="settings-group-label">Gestionar</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <span>Seguidores</span>
+          <span class="settings-val">0 ›</span>
+        </div>
+        <div class="settings-row">
+          <span>Privacidad</span>
+          <span class="settings-val">🌐 Público ›</span>
+        </div>
+        <div class="settings-row">
+          <span>Verificar mi perfil</span>
+          <span class="settings-val">›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AJUSTES -->
+  <div class="sub-modal" id="modal-settings">
+    <div class="sub-header">
+      <button class="icon-circle-btn" onclick="closeSettings()">✕</button>
+      <div style="font-size:17px; font-weight:700;">Ajustes</div>
+      <div style="width:34px;"></div>
+    </div>
+    <div class="profile-body">
+      <div class="settings-card">
+        <div class="settings-row"><span>Administrar cuentas</span><span class="settings-val">Cuenta 1 ›</span></div>
+        <div class="settings-row"><span>Preferencias</span><span class="settings-val">Español · USD ›</span></div>
+        <div class="settings-row"><span>Seguridad y privacidad</span><span class="settings-val">Face ID ›</span></div>
+        <div class="settings-row"><span>Redes activas</span><span class="settings-val">Solana ›</span></div>
+        <div class="settings-row"><span>Aplicaciones conectadas</span><span class="settings-val">›</span></div>
+        <div class="settings-row"><span>Notificaciones</span><span class="settings-val">Activadas ›</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      ['inicio', 'operar', 'predecir'].forEach(t => {
+        document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+        document.getElementById('screen-' + t).classList.toggle('active', t === tab);
+      });
+    }
+
+    function openDrawer() {
+      document.getElementById('drawer-backdrop').classList.add('open');
+      document.getElementById('side-drawer').classList.add('open');
+    }
+    function closeDrawer() {
+      document.getElementById('drawer-backdrop').classList.remove('open');
+      document.getElementById('side-drawer').classList.remove('open');
+    }
+
+    function openProfile() {
+      closeDrawer();
+      document.getElementById('modal-profile').classList.add('open');
+    }
+    function closeProfile() {
+      document.getElementById('modal-profile').classList.remove('open');
+    }
+
+    function openManageProfile() {
+      document.getElementById('modal-manage').classList.add('open');
+    }
+    function closeManageProfile() {
+      document.getElementById('modal-manage').classList.remove('open');
+    }
+
+    function openSettings() {
+      closeDrawer();
+      document.getElementById('modal-settings').classList.add('open');
+    }
+    function closeSettings() {
+      document.getElementById('modal-settings').classList.remove('open');
+    }
+
+    function switchPosTab(tab) {
+      document.getElementById('pos-btn-open').classList.toggle('active', tab === 'open');
+      document.getElementById('pos-btn-closed').classList.toggle('active', tab === 'closed');
+      document.getElementById('pos-open').style.display = tab === 'open' ? 'block' : 'none';
+      document.getElementById('pos-closed').style.display = tab === 'closed' ? 'block' : 'none';
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js?v=3').catch(() => {});
+    }
+  </script>
+</body>
+</html>
